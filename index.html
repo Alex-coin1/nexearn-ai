@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexEarn AI</title>
+
+<link rel="icon" href="logo.png">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0d0d0d;
+  color: white;
+}
+
+header {
+  padding: 20px;
+  text-align: center;
+}
+
+header img {
+  width: 120px;
+}
+
+h1 {
+  margin: 10px 0;
+}
+
+.container {
+  max-width: 400px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: #00ff99;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.dashboard {
+  display: none;
+}
+
+.ref {
+  word-break: break-all;
+  font-size: 12px;
+  margin-top: 10px;
+  color: #00ffcc;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="logo.png" alt="logo">
+  <h1>NexEarn AI</h1>
+  <p>Earn rewards with AI-powered tasks 🚀</p>
+</header>
+
+<div class="container">
+
+<div class="card" id="auth">
+  <h3>Login / Register</h3>
+  <input id="username" placeholder="Username">
+  <button onclick="login()">Enter</button>
+</div>
+
+<div class="card dashboard" id="app">
+  <h3>Welcome <span id="user"></span></h3>
+  <p>Points: <span id="points">0</span></p>
+
+  <button onclick="earn()">Complete Task (+10)</button>
+
+  <h4>Referral Link</h4>
+  <div class="ref" id="ref"></div>
+
+  <button onclick="logout()">Logout</button>
+</div>
+
+</div>
+
+<script>
+let user = null;
+
+// قراءة رابط الإحالة
+const urlParams = new URLSearchParams(window.location.search);
+const refUser = urlParams.get("ref");
+
+function login() {
+  let name = document.getElementById("username").value.trim();
+
+  if (!name) {
+    alert("Enter username");
+    return;
+  }
+
+  user = name;
+
+  // إنشاء حساب إذا غير موجود
+  if (!localStorage.getItem(user)) {
+    localStorage.setItem(user, "0");
+
+    // مكافأة الإحالة
+    if (refUser && refUser !== user) {
+      let refPoints = parseInt(localStorage.getItem(refUser) || "0");
+      refPoints += 20;
+      localStorage.setItem(refUser, refPoints.toString());
+    }
+  }
+
+  document.getElementById("auth").style.display = "none";
+  document.getElementById("app").style.display = "block";
+
+  updateUI();
+}
+
+function updateUI() {
+  document.getElementById("user").innerText = user;
+
+  let pts = parseInt(localStorage.getItem(user) || "0");
+  document.getElementById("points").innerText = pts;
+
+  let link = window.location.origin + window.location.pathname + "?ref=" + user;
+  document.getElementById("ref").innerText = link;
+}
+
+function earn() {
+  if (!user) return;
+
+  let pts = parseInt(localStorage.getItem(user) || "0");
+  pts += 10;
+
+  localStorage.setItem(user, pts.toString());
+  updateUI();
+}
+
+function logout() {
+  user = null;
+  location.reload();
+}
+</script>
+
+</body>
+</html>
